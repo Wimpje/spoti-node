@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<style>
+	body {
+		font-family: system, -apple-system, '.SFNSText-Regular', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
+		color: #fff;
+		background-color: #8aba87;
+		font-size: 20px;
+	}
+
+	h2 {
+		padding: 0;
+		margin: 0;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	#close {
+		color: white;
+		opacity: 0.7;
+		position: absolute;
+		bottom: 20px;
+		left: 50%;
+		transform: translateX(-50%);
+		font-size: 12px;
+		text-decoration: none;
+	}
+
+	.button {
+		background-image: -webkit-linear-gradient(top, #f4f1ee, #fff);
+		background-image: linear-gradient(top, #f4f1ee, #fff);
+		border-radius: 50%;
+		box-shadow: 0px 8px 10px 0px rgba(0, 0, 0, .3), inset 0px 4px 1px 1px white, inset 0px -3px 1px 1px rgba(204, 198, 197, .5);
+		float: left;
+		height: 70px;
+		margin: 0 30px 30px 0;
+		position: relative;
+		width: 70px;
+		-webkit-transition: all .1s linear;
+		transition: all .1s linear;
+	}
+
+	.button:after {
+		color: #e9e6e4;
+		content: "";
+		display: block;
+		font-size: 30px;
+		height: 30px;
+		text-decoration: none;
+		text-shadow: 0px -1px 1px #bdb5b4, 1px 1px 1px white;
+		position: absolute;
+		width: 30px;
+	}
+
+	.tick:after {
+		content: "✔";
+		left: 23px;
+		top: 16px;
+	}
+
+	.cross:after {
+		content: "✖";
+		left: 24px;
+		top: 15px;
+	}
+
+	.button:hover {
+		background-image: -webkit-linear-gradient(top, #fff, #f4f1ee);
+		background-image: linear-gradient(top, #fff, #f4f1ee);
+		color: #0088cc;
+	}
+
+
+	.tick:hover:after {
+		color: #83d244;
+		text-shadow: 0px 0px 6px #83d244;
+	}
+
+	.cross:hover:after {
+		color: #eb2f2f;
+		text-shadow: 0px 0px 6px #eb2f2f;
+	}
+
+	.button:active {
+		background-image: -webkit-linear-gradient(top, #efedec, #f7f4f4);
+		background-image: linear-gradient(top, #efedec, #f7f4f4);
+		box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .4), inset 0px -3px 1px 1px rgba(204, 198, 197, .5);
+	}
+
+	.button:active:after {
+		color: #dbd2d2;
+		text-shadow: 0px -1px 1px #bdb5b4, 0px 1px 1px white;
+	}
+
+	#playlists {
+		display: inline-block;
+		text-align: left;
+	}
+
+	.controls {
+		display: inline-block;
+		width: 100%;
+	}
+
+	ul {
+		list-style-type: none;
+
+	}
+</style>
+
+<div id="status">SpotiNode</div>
+<div class="controls">
+	<button class="button" data-controls="playPause">play/pause</button>
+	<button class="button" data-controls="next">next</button>
+	<button class="button" data-controls="previous">prev</button>
+	<button class="button" data-controls="status">status</button>
+	<button class="button" data-controls="authenticate">authenticate</button>
+	<button class="button" data-controls="volumeUp">up</button>
+	<button class="button" data-controls="volumeDown">down</button>
+	<button class="button" data-controls="getPlayLists">playlists</button>
+	<button class="button" data-controls="getActiveDevice">device</button>
+</div>
+<div id="playlists">
+
+</div>
+<div id="devices">
+
+</div>
+<a id="close" href="javascript:window.close()">Close this Window</a>
+<script>
+	require('./renderer.js')
+</script>
+
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "spoti-node",
+  "version": "1.0.0",
+  "description": "Control spotify via web-api and keyboard media-keys (no running spotify necessary)",
+  "main": "main.js",
+  "dependencies": {
+    "convict": "^4.4.0",
+    "electron-titlebar-windows": "^3.0.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "request-promise-native": "^1.0.5"
+  },
+  "devDependencies": {
+    "electron": "^3.0.8"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "@wimpje",
+  "license": "ISC"
+}
