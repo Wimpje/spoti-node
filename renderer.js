@@ -16,7 +16,7 @@ let poller = null
 
 const updateStatus = (status, noToast) => {
     const titleArtist = `${status.title} - ${status.artist}`
-    const display = `<h2>${titleArtist}</h2><p>Volume: ${status.volume}%</p>`
+    const display = `<h2>${titleArtist}</h2><p>Volume: ${status.volume}%</p><p>Playing on: ${spotify.getCurrentDevice()}</p>`
     document.getElementById('status').innerHTML = `${display}`
     document.title = titleArtist
     if (!noToast && currentNotification)

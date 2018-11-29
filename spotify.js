@@ -100,6 +100,8 @@ const handleCallback = async (redirectUrl, window) => {
         updateAuth(JSON.parse(resp.body))
         // start refreshing every 30? minutes
         tokenRefresher()
+        // make sure at least one device is active
+        await initDevice()
         return await status()
     }
     else {
@@ -218,7 +220,6 @@ const play = async (currentStatus) => {
 }
 
 const playItem = async (item, currentStatus) => {
-
     const resp = await spotifyApiRequestAsync('https://api.spotify.com/v1/me/player/play?device_id=' + device_id, 'PUT', { context_uri: item })
     console.log('play item', item, resp)
     currentStatus.isPlaying = true
@@ -248,7 +249,6 @@ const togglePlayPause = async () => {
     }
 }
 
-
 const tokenRefresher = (interval) => {
     interval = interval || 30 * 1000 * 60 // 30 minutes
     return setInterval(() => {
@@ -267,13 +267,20 @@ const getDeviceInfo = async () => {
 const initDevice = async (id) => {
     // first determine there is an active player, if not, activate
     const deviceInfo = await getDeviceInfo()
-    let device = deviceInfo.devices.filter(d => d.id === id)
+    let device
+    if (id)
+        device = deviceInfo.devices.filter(d => d.id === id)
+    else
+        device = deviceInfo.devices.filter(d => d.is_active)
+
     console.log(id, deviceInfo)
     if (!device)
-        throw new Error('device not found', id)
+        throw new Error('device not found')
+
     device = device[0]
 
     device_id = device.id
+    device_name = device.name
     // set volume to 50, as precaution?
     await volume(50)
 
@@ -284,6 +291,10 @@ const initDevice = async (id) => {
         console.log('activated?')
     }
     return device
+}
+
+const getCurrentDevice = () => {
+    return device_name
 }
 
 module.exports.updateAuth = updateAuth
@@ -301,3 +312,5 @@ module.exports.getPlayLists = getPlayLists
 module.exports.playItem = playItem
 module.exports.initDevice = initDevice
 module.exports.getDeviceInfo = getDeviceInfo
+module.exports.getCurrentDevice = getCurrentDevice
+
