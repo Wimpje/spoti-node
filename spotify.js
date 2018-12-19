@@ -10,6 +10,15 @@ const clientId = config.get('spotifyClientID')
 const clientSecret = config.get('spotifyClientSecret')
 const redirectUri = `https://${host}/callback`
 let device_id = ''
+let device_name = ''
+
+let currentStatus = {
+    isPlaying: false,
+    volume: 50,
+    title: '',
+    artist: '',
+    json: {}
+}
 
 // TODO store nicer
 const authorization = {
@@ -120,7 +129,7 @@ const spotifyApiRequestAsync = async (url, method, body) => {
         if (resp === '')
             return resp
         const jsonResponse = JSON.parse(resp)
-        console.log(jsonResponse)
+        console.log(url, jsonResponse)
         return jsonResponse
     }
     catch (err) {
@@ -131,26 +140,34 @@ const spotifyApiRequestAsync = async (url, method, body) => {
     }
 }
 
+const updateCurrentStatus = (newStatus) => {
+    currentStatus = newStatus
+
+    return currentStatus
+}
+
 const status = async () => {
     try {
         const jsonResponse = await spotifyApiRequestAsync('https://api.spotify.com/v1/me/player?device_id=' + device_id, 'GET')
 
         if (jsonResponse) {
-            return {
+            return updateCurrentStatus({
                 isPlaying: jsonResponse.is_playing,
                 volume: jsonResponse.device.volume_percent,
                 title: jsonResponse.item.name,
-                artist: jsonResponse.item.artists.map((artist) => { return artist.name }).join(', ')
-            }
+                artist: jsonResponse.item.artists.map((artist) => { return artist.name }).join(', '),
+                json: jsonResponse
+            })
         }
         else {
             console.log('no response for status request, returning empty object')
-            return {
+            return updateCurrentStatus({
                 isPlaying: false,
                 volume: 50,
                 title: '',
-                artist: ''
-            }
+                artist: '',
+                json: {}
+            })
         }
 
     }
@@ -178,18 +195,42 @@ const previous = async () => {
     return await status()
 }
 
+const saveTrack = async (trackId) => {
+    if (!trackId)
+        throw new Error('No track id provided')
+
+    try {
+        const resp = await spotifyApiRequestAsync(`https://api.spotify.com/v1/me/tracks/contains?ids=${trackId}`, 'GET')
+        console.log('saved track contains? ', resp)
+        if (Array.isArray(resp) && Array.isArray[0] === 'false') {
+            resp = await spotifyApiRequestAsync(`https://api.spotify.com/v1/me/tracks?ids=${trackId}`, 'PUT')
+            console.log('saved track resp:', resp)
+            return 'Saved'
+        }
+        else {
+            console.log('already in saved tracks')
+            return 'Already saved'
+        }
+    }
+    catch (err) {
+        return err.message
+    }
+}
+
 const volumeUp = async (percentage) => {
+    percentage = percentage || 10
     const s = await status()
     console.log('volume' + s.volume)
-    s.volume = Math.min(100, s.volume + 10)
+    s.volume = Math.min(100, s.volume + percentage)
     volume(s.volume)
     return s
 }
 
 const volumeDown = async (percentage) => {
+    percentage = percentage || 10
     const s = await status()
     console.log('volume' + s.volume)
-    s.volume = Math.max(0, s.volume - 10)
+    s.volume = Math.max(0, s.volume - percentage)
     volume(s.volume)
     return s
 }
@@ -212,31 +253,31 @@ const volume = async (percentage) => {
     return resp
 }
 
-const play = async (currentStatus) => {
+const play = async (s) => {
     const resp = await spotifyApiRequestAsync('https://api.spotify.com/v1/me/player/play?device_id=' + device_id, 'PUT')
     console.log('play', resp)
-    currentStatus.isPlaying = true
-    return currentStatus || await status()
+    s.isPlaying = true
+    return updateCurrentStatus(s)
 }
 
-const playItem = async (item, currentStatus) => {
+const playItem = async (item, s) => {
     const resp = await spotifyApiRequestAsync('https://api.spotify.com/v1/me/player/play?device_id=' + device_id, 'PUT', { context_uri: item })
     console.log('play item', item, resp)
-    currentStatus.isPlaying = true
-    return currentStatus || await status()
+    s.isPlaying = true
+    return updateCurrentStatus(s)
 }
 
-const getPlayLists = async (currentStatus) => {
+const getPlayLists = async () => {
     const resp = await spotifyApiRequestAsync('https://api.spotify.com/v1/me/playlists', 'GET')
     console.log('getPlayLists', resp)
     return resp
 }
 
-const pause = async (currentStatus) => {
+const pause = async (s) => {
     const resp = await spotifyApiRequestAsync('https://api.spotify.com/v1/me/player/pause?device_id=' + device_id, 'PUT')
     console.log('pause', resp)
-    currentStatus.isPlaying = false
-    return currentStatus || await status()
+    s.isPlaying = false
+    return updateCurrentStatus(s)
 }
 
 const togglePlayPause = async () => {
@@ -287,7 +328,7 @@ const initDevice = async (id) => {
     if (!device.is_active) {
         // this should activate the device...
         await spotifyApiRequestAsync('https://api.spotify.com/v1/me/player', 'PUT', { device_ids: [device_id] })
-        
+
         console.log('activated?')
     }
     return device
@@ -313,4 +354,7 @@ module.exports.playItem = playItem
 module.exports.initDevice = initDevice
 module.exports.getDeviceInfo = getDeviceInfo
 module.exports.getCurrentDevice = getCurrentDevice
+module.exports.saveTrack = saveTrack
+// this should be done differently I think
+module.exports.currentStatus = () => {return currentStatus}
 

@@ -19,7 +19,8 @@
 
 	#close {
 		color: white;
-		opacity: 0.7;
+		opacity: 0.9;
+		font-weight:bold;
 		position: absolute;
 		bottom: 20px;
 		left: 50%;
@@ -100,27 +101,43 @@
 	}
 
 	.controls {
-		display: inline-block;
 		width: 100%;
+		float: right;
+		top: 1px;
 	}
 
 	ul {
 		list-style-type: none;
 
 	}
+	#rawstatus {
+		opacity: 0.6;
+		top: 230px;
+		left: 10%;
+		height: 50%;
+		position: absolute;
+		width: 50%;
+	}
+	#album-art {
+		float: right;
+		top: 10%;
+		right: 10%;
+	}
+
 </style>
 
 <div id="status">SpotiNode</div>
+<div id="rawstatus"></div>
 <div class="controls">
 	<button class="button" data-controls="playPause">play/pause</button>
 	<button class="button" data-controls="next">next</button>
 	<button class="button" data-controls="previous">prev</button>
-	<button class="button" data-controls="status">status</button>
 	<button class="button" data-controls="authenticate">authenticate</button>
 	<button class="button" data-controls="volumeUp">up</button>
 	<button class="button" data-controls="volumeDown">down</button>
 	<button class="button" data-controls="getPlayLists">playlists</button>
 	<button class="button" data-controls="getActiveDevice">device</button>
+	<button class="button" data-controls="saveTrack">save track</button>
 </div>
 <div id="playlists">
 
@@ -129,6 +146,7 @@
 
 </div>
 <a id="close" href="javascript:window.close()">Close this Window</a>
+
 <script>
 	require('./renderer.js')
 </script>
